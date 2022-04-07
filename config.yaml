@@ -1,0 +1,51 @@
+
+twitter_api:
+  api_key:        xxxx
+  api_key_secret: xxxx
+  bearer_token:   xxxx
+
+  rules_url:            &rules_url https://api.twitter.com/2/tweets/search/stream/rules
+  stream_url:           &stream_url https://api.twitter.com/2/tweets/sample/stream
+  filtered_stream_url:  &filtered_stream_url https://api.twitter.com/2/tweets/search/stream
+
+  project_user_agent:     &project_user_agent ml_prject
+  project_authorization:  &project_authorization Bearer xxxx
+  project_content_type:   &project_content_type application/json
+
+  project_common_header:  &project_common_header
+    User-Agent:     *project_user_agent
+    Authorization:  *project_authorization
+    Content-Type:   *project_content_type
+
+  requests:
+    stream_connect:
+      timeout: 20
+      method: get
+      headers: *project_common_header
+      params:
+        expansions: author_id,geo.place_id
+        tweet.fields: id,text,geo
+        user.fields: name,username,location
+        place.fields: name
+
+    set_rules:
+      method: post
+      headers: *project_common_header
+      body:
+        add:
+          - value: -is:retweet Adana OR Kocaeli OR İzmir OR İstanbul OR Ankara lang:tr
+            tag: filtered_stream_rules
+
+    get_all_rules:
+      method: get
+      headers: *project_common_header
+
+    delete_all_rules:
+      method: post
+      headers: *project_common_header
+      body:
+
+database_config:
+  adapter: 'sqlite3'
+  database: 'tweets.db'
+
